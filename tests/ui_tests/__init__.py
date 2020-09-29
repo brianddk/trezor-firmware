@@ -11,7 +11,8 @@ from .reporting import testreport
 
 UI_TESTS_DIR = Path(__file__).parent.resolve()
 HASH_FILE = UI_TESTS_DIR / "fixtures.json"
-HASHES = {}
+FILE_HASHES = {}
+ACTUAL_HASHES = {}
 PROCESSED = set()
 
 
@@ -29,7 +30,7 @@ def get_test_name(node_id):
 
 def _process_recorded(screen_path, test_name):
     # calculate hash
-    HASHES[test_name] = _hash_files(screen_path)
+    FILE_HASHES[test_name] = _hash_files(screen_path)
     _rename_records(screen_path)
     PROCESSED.add(test_name)
 
@@ -50,13 +51,14 @@ def _hash_files(path):
 
 
 def _process_tested(fixture_test_path, test_name):
-    expected_hash = HASHES.get(test_name)
+    expected_hash = FILE_HASHES.get(test_name)
     if expected_hash is None:
         raise ValueError("Hash for '%s' not found in fixtures.json" % test_name)
     PROCESSED.add(test_name)
 
     actual_path = fixture_test_path / "actual"
     actual_hash = _hash_files(actual_path)
+    ACTUAL_HASHES[test_name] = actual_hash
 
     _rename_records(actual_path)
 
@@ -103,20 +105,28 @@ def screen_recording(client, request):
 
 
 def list_missing():
-    return set(HASHES.keys()) - PROCESSED
+    return set(FILE_HASHES.keys()) - PROCESSED
 
 
 def read_fixtures():
     if not HASH_FILE.exists():
         raise ValueError("File fixtures.json not found.")
-    global HASHES
-    HASHES = json.loads(HASH_FILE.read_text())
+    global FILE_HASHES
+    FILE_HASHES = json.loads(HASH_FILE.read_text())
 
 
 def write_fixtures(remove_missing: bool):
-    if remove_missing:
-        write = {i: HASHES[i] for i in PROCESSED}
-    else:
-        write = HASHES
+    HASH_FILE.write_text(_get_fixtures_content(FILE_HASHES, remove_missing))
 
-    HASH_FILE.write_text(json.dumps(write, indent="", sort_keys=True) + "\n")
+
+def print_actual_fixtures(remove_missing: bool):
+    print(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
+
+
+def _get_fixtures_content(fixtures: dict, remove_missing: bool):
+    if remove_missing:
+        fixtures = {i: fixtures[i] for i in PROCESSED}
+    else:
+        fixtures = fixtures
+
+    return json.dumps(fixtures, indent="", sort_keys=True) + "\n"
