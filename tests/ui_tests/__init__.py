@@ -119,8 +119,10 @@ def write_fixtures(remove_missing: bool):
     HASH_FILE.write_text(_get_fixtures_content(FILE_HASHES, remove_missing))
 
 
-def print_actual_fixtures(remove_missing: bool):
-    print(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
+def write_fixtures_suggestion(remove_missing: bool):
+    file = (UI_TESTS_DIR / "fixtures.suggestion.json")
+    print("See:", file)
+    file.write_text(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
 
 
 def _get_fixtures_content(fixtures: dict, remove_missing: bool):

@@ -192,7 +192,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     if ui_option == "test" and _should_write_ui_report(exitstatus):
         println("\n-------- Suggested fixtures.json diff: --------")
-        ui_tests.print_actual_fixtures(config.getoption("ui_check_missing"))
+        ui_tests.write_fixtures_suggestion(config.getoption("ui_check_missing"))
         println("")
 
     if _should_write_ui_report(exitstatus):
