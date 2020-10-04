@@ -24,6 +24,7 @@ pytestmark = pytest.mark.skip_t1
 
 
 @pytest.mark.skip_ui
+@pytest.mark.setup_client(experimental_features=True)
 def test_ownership_id(client):
     ownership_id = btc.get_ownership_id(
         client,
@@ -38,6 +39,7 @@ def test_ownership_id(client):
 
 
 @pytest.mark.skip_ui
+@pytest.mark.setup_client(experimental_features=True)
 def test_p2wpkh_ownership_proof(client):
     ownership_proof, _ = btc.get_ownership_proof(
         client,
@@ -52,6 +54,7 @@ def test_p2wpkh_ownership_proof(client):
 
 
 @pytest.mark.skip_ui
+@pytest.mark.setup_client(experimental_features=True)
 def test_fake_ownership_id(client):
     with pytest.raises(TrezorFailure, match="Invalid ownership identifier"):
         btc.get_ownership_proof(
@@ -65,6 +68,7 @@ def test_fake_ownership_id(client):
         )
 
 
+@pytest.mark.setup_client(experimental_features=True)
 def test_confirm_ownership_proof(client):
     ownership_proof, _ = btc.get_ownership_proof(
         client,
@@ -80,6 +84,7 @@ def test_confirm_ownership_proof(client):
     )
 
 
+@pytest.mark.setup_client(experimental_features=True)
 def test_confirm_ownership_proof_with_data(client):
     ownership_proof, _ = btc.get_ownership_proof(
         client,

@@ -219,3 +219,44 @@ class TestMsgApplysettings:
         with client:
             client.set_expected_responses([messages.ButtonRequest, messages.Address])
             get_bad_address()
+
+    @pytest.mark.skip_t1
+    @pytest.mark.setup_client(experimental_features=False, pin=PIN4)
+    def test_experimental_features(self, client):
+        def experimental_call():
+            btc.authorize_coinjoin(
+                client,
+                coordinator="www.example.com",
+                max_total_fee=10010,
+                fee_per_anonymity=5000000,  # 0.005 %
+                n=parse_path("m/84'/1'/0'"),
+                coin_name="Testnet",
+                script_type=messages.InputScriptType.SPENDWITNESS,
+            )
+
+        assert client.features.experimental_features is None
+
+        # unlock
+        with client:
+            _set_expected_responses(client)
+            device.apply_settings(client, label="new label")
+
+        assert not client.features.experimental_features
+
+        with pytest.raises(exceptions.TrezorFailure, match="UnexpectedMessage"), client:
+            client.set_expected_responses([messages.Failure])
+            experimental_call()
+
+        with client:
+            client.set_expected_responses(
+                [messages.ButtonRequest, messages.Success, messages.Features]
+            )
+            device.apply_settings(client, experimental_features=True)
+
+        assert client.features.experimental_features
+
+        with client:
+            client.set_expected_responses(
+                [messages.ButtonRequest, messages.ButtonRequest, messages.Success]
+            )
+            experimental_call()

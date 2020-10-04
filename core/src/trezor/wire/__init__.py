@@ -55,6 +55,7 @@ if False:
         Dict,
         Iterable,
         Optional,
+        Set,
         Tuple,
         Type,
         TypeVar,
@@ -74,14 +75,22 @@ workflow_handlers = {}  # type: Dict[int, Handler]
 workflow_packages = {}  # type: Dict[int, Tuple[str, str]]
 
 
-def add(wire_type: int, pkgname: str, modname: str) -> None:
+experimental_types = set()  # type: Set[int]
+experimental_enable = False  # type: bool
+
+
+def add(wire_type: int, pkgname: str, modname: str, experimental: bool = False) -> None:
     """Shortcut for registering a dynamically-imported Protobuf workflow."""
     workflow_packages[wire_type] = (pkgname, modname)
+    if experimental:
+        experimental_types.add(wire_type)
 
 
-def register(wire_type: int, handler: Handler) -> None:
+def register(wire_type: int, handler: Handler, experimental: bool = False) -> None:
     """Register `handler` to get scheduled after `wire_type` message is received."""
     workflow_handlers[wire_type] = handler
+    if experimental:
+        experimental_types.add(wire_type)
 
 
 def setup(iface: WireInterface, use_workflow: bool = True) -> None:
@@ -93,6 +102,7 @@ def clear() -> None:
     """Remove all registered handlers."""
     workflow_handlers.clear()
     workflow_packages.clear()
+    experimental_types.clear()
 
 
 if False:
@@ -449,6 +459,10 @@ async def handle_session(
 def find_registered_workflow_handler(
     iface: WireInterface, msg_type: int
 ) -> Optional[Handler]:
+    if msg_type in experimental_types and not experimental_enable:
+        # Message is for experimental feature but these are turned off.
+        return None
+
     if msg_type in workflow_handlers:
         # Message has a handler available, return it directly.
         handler = workflow_handlers[msg_type]
