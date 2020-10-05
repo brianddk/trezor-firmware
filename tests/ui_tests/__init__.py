@@ -120,7 +120,7 @@ def write_fixtures(remove_missing: bool):
 
 
 def write_fixtures_suggestion(remove_missing: bool):
-    file = (UI_TESTS_DIR / "fixtures.suggestion.json")
+    file = UI_TESTS_DIR / "fixtures.suggestion.json"
     print("See:", file)
     file.write_text(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
 
