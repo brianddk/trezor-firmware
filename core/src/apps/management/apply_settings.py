@@ -192,8 +192,8 @@ async def require_confirm_safety_checks(ctx, level: EnumTypeSafetyCheckLevel) ->
 
 async def require_confirm_experimental_features(ctx, enable: bool) -> None:
     if enable:
-        text = Text("Experimental mode", ui.ICON_CONFIG)
+        text = Text("Developer mode", ui.ICON_CONFIG)
         text.normal("Enable experimental", "features?")
         text.br_half()
-        text.bold("Development use only!")
+        text.bold("Only for development", "and beta testing!")
         await require_confirm(ctx, text, ButtonRequestType.ProtectCall)
