@@ -110,7 +110,6 @@ def client(request):
         passphrase=False,
         needs_backup=False,
         no_backup=False,
-        experimental_features=False,
     )
 
     marker = request.node.get_closest_marker("setup_client")
@@ -134,9 +133,7 @@ def client(request):
         )
 
         if client.features.model == "T":
-            apply_settings(
-                client, experimental_features=setup_params["experimental_features"]
-            )
+            apply_settings(client, experimental_features=True)
 
         if use_passphrase and isinstance(setup_params["passphrase"], str):
             client.use_passphrase(setup_params["passphrase"])

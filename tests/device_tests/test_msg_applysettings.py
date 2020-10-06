@@ -221,7 +221,6 @@ class TestMsgApplysettings:
             get_bad_address()
 
     @pytest.mark.skip_t1
-    @pytest.mark.setup_client(experimental_features=False, pin=PIN4)
     def test_experimental_features(self, client):
         def experimental_call():
             btc.authorize_coinjoin(
@@ -241,22 +240,20 @@ class TestMsgApplysettings:
             _set_expected_responses(client)
             device.apply_settings(client, label="new label")
 
-        assert not client.features.experimental_features
-
-        with pytest.raises(exceptions.TrezorFailure, match="UnexpectedMessage"), client:
-            client.set_expected_responses([messages.Failure])
-            experimental_call()
-
-        with client:
-            client.set_expected_responses(
-                [messages.ButtonRequest, messages.Success, messages.Features]
-            )
-            device.apply_settings(client, experimental_features=True)
-
         assert client.features.experimental_features
 
         with client:
             client.set_expected_responses(
                 [messages.ButtonRequest, messages.ButtonRequest, messages.Success]
             )
+            experimental_call()
+
+        with client:
+            client.set_expected_responses([messages.Success, messages.Features])
+            device.apply_settings(client, experimental_features=False)
+
+        assert not client.features.experimental_features
+
+        with pytest.raises(exceptions.TrezorFailure, match="UnexpectedMessage"), client:
+            client.set_expected_responses([messages.Failure])
             experimental_call()

@@ -41,7 +41,7 @@ ROUND_ID_LEN = 32
 pytestmark = pytest.mark.skip_t1
 
 
-@pytest.mark.setup_client(pin=PIN, experimental_features=True)
+@pytest.mark.setup_client(pin=PIN)
 def test_sign_tx(client):
     commitment_data = b"www.example.com" + (1).to_bytes(ROUND_ID_LEN, "big")
 
@@ -207,7 +207,6 @@ def test_sign_tx(client):
         )
 
 
-@pytest.mark.setup_client(experimental_features=True)
 def test_unfair_fee(client):
     # Test unfair mining fee distribution amongst participants.
 
@@ -285,7 +284,6 @@ def test_unfair_fee(client):
         )
 
 
-@pytest.mark.setup_client(experimental_features=True)
 def test_no_anonymity(client):
     # Test CoinJoin transaction giving the user's outputs no gain in anonymity.
 
@@ -375,7 +373,6 @@ def test_no_anonymity(client):
         )
 
 
-@pytest.mark.setup_client(experimental_features=True)
 def test_wrong_coordinator(client):
     # Ensure that a preauthorized GetOwnershipProof fails if the commitment_data doesn't match the coordinator.
 
@@ -400,7 +397,6 @@ def test_wrong_coordinator(client):
         )
 
 
-@pytest.mark.setup_client(experimental_features=True)
 def test_cancel_authorization(client):
     # Ensure that a preauthorized GetOwnershipProof fails if the commitment_data doesn't match the coordinator.
 
@@ -428,7 +424,6 @@ def test_cancel_authorization(client):
 
 
 @pytest.mark.skip_ui
-@pytest.mark.setup_client(experimental_features=True)
 def test_multisession_authorization(client):
     # Authorize CoinJoin with www.example1.com in session 1.
     btc.authorize_coinjoin(
