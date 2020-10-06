@@ -211,7 +211,7 @@ def safety_checks(client, always, level):
 
 
 @cli.command()
-@click.option("--enable/--disable", default=False)
+@click.argument("enable", type=ChoiceType({"on": True, "off": False}))
 @with_client
 def experimental_features(client, enable):
     """Enable or disable experimental message types.
