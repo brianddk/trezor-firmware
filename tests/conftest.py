@@ -163,12 +163,14 @@ def pytest_sessionfinish(session, exitstatus):
     if not _should_write_ui_report(exitstatus):
         return
 
+    missing = session.config.getoption("ui_check_missing")
     if session.config.getoption("ui") == "test":
-        if session.config.getoption("ui_check_missing") and ui_tests.list_missing():
+        if missing and ui_tests.list_missing():
             session.exitstatus = pytest.ExitCode.TESTS_FAILED
+        ui_tests.write_fixtures_suggestion(missing)
         testreport.index()
     if session.config.getoption("ui") == "record":
-        ui_tests.write_fixtures(session.config.getoption("ui_check_missing"))
+        ui_tests.write_fixtures(missing)
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
@@ -192,7 +194,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     if ui_option == "test" and _should_write_ui_report(exitstatus):
         println("\n-------- Suggested fixtures.json diff: --------")
-        ui_tests.write_fixtures_suggestion(config.getoption("ui_check_missing"))
+        print("See", ui_tests.SUGGESTION_FILE)
         println("")
 
     if _should_write_ui_report(exitstatus):

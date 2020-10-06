@@ -11,6 +11,7 @@ from .reporting import testreport
 
 UI_TESTS_DIR = Path(__file__).parent.resolve()
 HASH_FILE = UI_TESTS_DIR / "fixtures.json"
+SUGGESTION_FILE = UI_TESTS_DIR / "fixtures.suggestion.json"
 FILE_HASHES = {}
 ACTUAL_HASHES = {}
 PROCESSED = set()
@@ -120,9 +121,7 @@ def write_fixtures(remove_missing: bool):
 
 
 def write_fixtures_suggestion(remove_missing: bool):
-    file = UI_TESTS_DIR / "fixtures.suggestion.json"
-    print("See:", file)
-    file.write_text(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
+    SUGGESTION_FILE.write_text(_get_fixtures_content(ACTUAL_HASHES, remove_missing))
 
 
 def _get_fixtures_content(fixtures: dict, remove_missing: bool):
